@@ -73,6 +73,78 @@ FEATURE_COLUMNS = [
     "Tendency",
 ]
 
+# Real labeled rows from CTG.xls (NSP = ground truth).
+# Loading these usually yields the matching prediction with a decent model trained on CTG.
+SAMPLE_NORMAL = {
+    "LB": 132.0,
+    "AC": 0.006379585326953748,
+    "FM": 0.0,
+    "UC": 0.006379585326953748,
+    "DL": 0.003189792663476874,
+    "DS": 0.0,
+    "DP": 0.0,
+    "ASTV": 17.0,
+    "MSTV": 2.1,
+    "ALTV": 0.0,
+    "MLTV": 10.4,
+    "Width": 130.0,
+    "Min": 68.0,
+    "Max": 198.0,
+    "Nmax": 6.0,
+    "Nzeros": 1.0,
+    "Mode": 141.0,
+    "Mean": 136.0,
+    "Median": 140.0,
+    "Variance": 12.0,
+    "Tendency": 0.0,
+}
+SAMPLE_SUSPECT = {
+    "LB": 120.0,
+    "AC": 0.0,
+    "FM": 0.0,
+    "UC": 0.0,
+    "DL": 0.0,
+    "DS": 0.0,
+    "DP": 0.0,
+    "ASTV": 73.0,
+    "MSTV": 0.5,
+    "ALTV": 43.0,
+    "MLTV": 2.4,
+    "Width": 64.0,
+    "Min": 62.0,
+    "Max": 126.0,
+    "Nmax": 2.0,
+    "Nzeros": 0.0,
+    "Mode": 120.0,
+    "Mean": 137.0,
+    "Median": 121.0,
+    "Variance": 73.0,
+    "Tendency": 1.0,
+}
+SAMPLE_PATHOLOGIC = {
+    "LB": 134.0,
+    "AC": 0.001049317943336831,
+    "FM": 0.0,
+    "UC": 0.01049317943336831,
+    "DL": 0.00944386149003148,
+    "DS": 0.0,
+    "DP": 0.002098635886673662,
+    "ASTV": 26.0,
+    "MSTV": 5.9,
+    "ALTV": 0.0,
+    "MLTV": 0.0,
+    "Width": 150.0,
+    "Min": 50.0,
+    "Max": 200.0,
+    "Nmax": 5.0,
+    "Nzeros": 3.0,
+    "Mode": 76.0,
+    "Mean": 107.0,
+    "Median": 107.0,
+    "Variance": 170.0,
+    "Tendency": 0.0,
+}
+
 # Default values are simple, safe starters.
 DEFAULT_VALUES = {
     "LB": 130.0,
@@ -102,23 +174,55 @@ DEFAULT_VALUES = {
 # -----------------------------
 # User input form
 # -----------------------------
-st.subheader("Enter CTG feature values")
-st.caption("Tip: Keep defaults if you are just testing the app.")
+if "inputs" not in st.session_state:
+    st.session_state.inputs = DEFAULT_VALUES.copy()
+if "widget_version" not in st.session_state:
+    st.session_state.widget_version = 0
+if "run_predict_next" not in st.session_state:
+    st.session_state.run_predict_next = False
 
+
+def load_sample(sample_dict):
+    st.session_state.inputs = {k: float(sample_dict[k]) for k in FEATURE_COLUMNS}
+    st.session_state.widget_version += 1
+    st.session_state.run_predict_next = True
+    st.rerun()
+
+st.subheader("Enter CTG feature values")
+st.caption("Use the sample buttons to load labeled examples from the CTG dataset, or edit manually.")
+
+c1, c2, c3 = st.columns(3)
+with c1:
+    if st.button("Sample: Normal (NSP 1)"):
+        load_sample(SAMPLE_NORMAL)
+with c2:
+    if st.button("Sample: Suspect (NSP 2)"):
+        load_sample(SAMPLE_SUSPECT)
+with c3:
+    if st.button("Sample: Pathologic (NSP 3)"):
+        load_sample(SAMPLE_PATHOLOGIC)
+
+v = st.session_state.widget_version
 input_values = {}
 for feature in FEATURE_COLUMNS:
     input_values[feature] = st.number_input(
         label=feature,
-        value=float(DEFAULT_VALUES[feature]),
+        value=float(st.session_state.inputs[feature]),
         step=0.1,
         format="%.4f",
+        key=f"{feature}_v{v}",
     )
 
 
 # -----------------------------
 # Prediction
 # -----------------------------
-if st.button("Predict", type="primary"):
+want_predict = st.button("Predict", type="primary")
+if st.session_state.run_predict_next:
+    want_predict = True
+    st.session_state.run_predict_next = False
+
+if want_predict:
     # Convert user input to DataFrame with the exact feature order.
     input_df = pd.DataFrame([input_values], columns=FEATURE_COLUMNS)
 

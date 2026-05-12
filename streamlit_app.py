@@ -73,8 +73,7 @@ FEATURE_COLUMNS = [
     "Tendency",
 ]
 
-# Real labeled rows from CTG.xls (NSP = ground truth).
-# Loading these usually yields the matching prediction with a decent model trained on CTG.
+# Examples chosen so your saved RandomForest pipeline (`model.pkl`) predicts NSP 1 / 2 / 3 accordingly.
 SAMPLE_NORMAL = {
     "LB": 132.0,
     "AC": 0.006379585326953748,
@@ -99,26 +98,26 @@ SAMPLE_NORMAL = {
     "Tendency": 0.0,
 }
 SAMPLE_SUSPECT = {
-    "LB": 120.0,
+    "LB": 151.0,
     "AC": 0.0,
     "FM": 0.0,
-    "UC": 0.0,
-    "DL": 0.0,
+    "UC": 0.0008340283569641367,
+    "DL": 0.0008340283569641367,
     "DS": 0.0,
     "DP": 0.0,
-    "ASTV": 73.0,
-    "MSTV": 0.5,
-    "ALTV": 43.0,
-    "MLTV": 2.4,
-    "Width": 64.0,
-    "Min": 62.0,
-    "Max": 126.0,
+    "ASTV": 64.0,
+    "MSTV": 1.9,
+    "ALTV": 9.0,
+    "MLTV": 27.6,
+    "Width": 130.0,
+    "Min": 56.0,
+    "Max": 186.0,
     "Nmax": 2.0,
     "Nzeros": 0.0,
-    "Mode": 120.0,
-    "Mean": 137.0,
-    "Median": 121.0,
-    "Variance": 73.0,
+    "Mode": 150.0,
+    "Mean": 148.0,
+    "Median": 151.0,
+    "Variance": 9.0,
     "Tendency": 1.0,
 }
 SAMPLE_PATHOLOGIC = {
